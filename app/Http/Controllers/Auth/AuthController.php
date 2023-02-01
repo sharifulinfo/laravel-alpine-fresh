@@ -41,8 +41,7 @@ class AuthController extends Controller {
         $data = [];
         if($request->ajax()){
             $validate = Validator::make($request->all(), [
-                'first_name' => 'required',
-                'last_name'  => 'required',
+                'name' => 'required',
                 'email'      => 'required|email',
                 'password'   => 'required|min:8',
             ]);

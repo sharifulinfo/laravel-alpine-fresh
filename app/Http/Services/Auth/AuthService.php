@@ -12,9 +12,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 
 
-class AuthService  extends BaseService {
+class AuthService extends BaseService {
     use helperTrait;
 
     /**
@@ -23,36 +24,18 @@ class AuthService  extends BaseService {
      * @return JsonResponse
      */
     public function login($request): JsonResponse {
-
-
-        $this->reCaptchaValidate($request);
-
-
-
+//        $this->reCaptchaValidate($request);
         $credentials = [
             'email'    => strtolower($request->email),
             'password' => $request->password,
         ];
-        pp($credentials);
-
-        try {
+//        try {
             if (Auth::attempt($credentials)) {
                 $this->setRememberMe($request);
                 $user_data = auth()->user();
-
-
-
-                $this->mdb->update([
-                    'index' => TBL_USER,
-                    'id'    => $user_data->_id,
-                    'body'  => [
-                        'doc' => [
-                            'last_login_at' => time()
-                        ]
-                    ]
-                ]);
+                DB::table(TBL_USER)->where('id', $user_data->id)->update(['last_login_at' => date('Y-m-d H:i:s')]);
                 $response_data = [
-                    'id'        => $user_data->_id,
+                    'id'        => $user_data->id,
                     'name'      => $user_data->name,
                     'email'     => $user_data->email,
                     'user_type' => $user_data->user_type,
@@ -61,82 +44,33 @@ class AuthService  extends BaseService {
             } else {
                 return $this->eResponse([], 'Invalid email or password');
             }
-        } catch (\Exception $e) {
-            return $this->eResponse($e);
-        }
+//        } catch (\Exception $e) {
+//            return $this->eResponse($e);
+//        }
     }
 
     public function registration($request): JsonResponse {
-        $this->reCaptchaValidate($request);
-        $alreadyExists = $this->mdb->count([
-            'index' => TBL_USER,
-            'body'  => [
-                'query' => [
-                    'match' => [
-                        'email.keyword' => strtolower($request->email)
-                    ]
-                ]
-            ]
-        ])['count'];
-        if ($alreadyExists > 0) {
-            return $this->eResponse([], 'email_exists');
+//        $this->reCaptchaValidate($request);
+        $user = DB::table(TBL_USER)->where('email', $request->email)->count();
+        if ($user > 0) {
+            return $this->eResponse([], 'Sorry this email is already taken');
+        }
+        $userData = [
+            'name'       => $request->name,
+            'email'      => strtolower($request->email),
+            'user_type'  => 'user',#admin
+            'password'   => Hash::make($request->password),
+        ];
+        DB::table(TBL_USER)->insert($userData);
+//        DB::table(TBL_USER)->insertGetId($userData);
+        $credentials = [
+            'email'    => strtolower($request->email),
+            'password' => $request->password,
+        ];
+        if (Auth::attempt($credentials)) {
+            return $this->sResponse($credentials);
         } else {
-            $prepare_reg_data = $this->prepareUserData($request, 'registration');
-            $ws = new WorkspaceService();
-            $id = randomString(32);
-            $workspace = $ws->createDefaultWorkspace($id);
-            sleep(1.5);
-            $ws->addMemberToWorkspace($workspace['id'], $id);
-            $prepare_reg_data['active_workspace'] = $workspace['id'];
-            $regUser = $this->mdb->index([
-                'index' => TBL_USER,
-                'id'    => $id,
-                'body'  => $prepare_reg_data
-            ]);
-            if (!$regUser) {
-                $this->mdb->index([
-                    'index' => TBL_PROSPECT_LIST,
-                    'id'    => randomString(32),
-                    'body'  => [
-                        'workspace_id' => $workspace['id'],
-                        'user_id'      => $id,
-                        'name'         => 'Graveyard List',
-                        'quantity'     => 0,
-                        'is_graveyard' => 1,
-                        'created_at'   => time(),
-                        'updated_at'   => time(),
-                    ]
-                ]);
-                return $this->eResponse([], 'Register not success');
-            } else {
-                sleep(2);
-                /*if (config('app.debug') == FALSE) {
-                    Mail::send('mails.verify-email', $prepare_reg_data, function ($message) use ($prepare_reg_data) {
-                        $message->from('team@outreachbin.com', 'OutreachBin');
-                        $message->to($prepare_reg_data['email'])->subject('Verify your account - OutreachBin');
-                    });
-                }
-
-                try {
-                    if (config('app.debug') == FALSE) {
-                        Mail::send('mails.greetings', $prepare_reg_data, function ($message) use ($prepare_reg_data) {
-                            $message->from('team@outreachbin.com', 'OutreachBin');
-                            $message->to($prepare_reg_data['email'])->subject('Welcome to OutReachbin');
-                        });
-                    }
-                } catch (\Throwable $th) {
-                }*/
-
-                $credentials = [
-                    'email'    => strtolower($request->email),
-                    'password' => $request->password,
-                ];
-                if (Auth::attempt($credentials)) {
-                    return $this->sResponse($credentials);
-                } else {
-                    return $this->eResponse([], 'Invalid email or password');
-                }
-            }
+            return $this->eResponse([], 'Invalid email or password');
         }
     }
 
@@ -147,10 +81,11 @@ class AuthService  extends BaseService {
      *
      * @return JsonResponse
      */
-    public function loginWithSocial($request, $user_social_data, $driver): JsonResponse {
+    public
+    function loginWithSocial($request, $user_social_data, $driver): JsonResponse {
         $user_exist = $this->mdb->search([
             'index' => TBL_USER,
-            'size' => 1,
+            'size'  => 1,
             'body'  => [
                 'query' => [
                     'match' => [
@@ -171,7 +106,7 @@ class AuthService  extends BaseService {
                     'index' => TBL_WORKSPACE,
                     'id'    => $userData['active_ workspace']
                 ]);
-            }catch(\Throwable $th){
+            } catch (\Throwable $th) {
                 $ws = new WorkspaceService();
                 $ws->activeDefaultWorkspace($userId);
             }
@@ -220,101 +155,8 @@ class AuthService  extends BaseService {
         }
     }
 
-    /**
-     * @param $request
-     * @param string $mode
-     * @param array $user_social_data
-     * @param string $driver
-     *
-     * @return array
-     */
-    public function prepareUserData($request, string $mode = 'registration', $user_social_data = [], string $driver = ''): array {
-        if (!isset($request->timezone)) {
-            $timezone = 'UTC';
-            $ipInfo = file_get_contents('http://ip-api.com/json/' . $request->ip);
-            if (isset($ipInfo)) {
-                $ipInfo = json_decode($ipInfo);
-                if (isset($ipInfo->timezone)) {
-                    $timezone = $ipInfo->timezone;
-                }
-            }
-        } else {
-            $timezone = $request->timezone;
-        }
-        $email = isset($user_social_data->email) ? $user_social_data->email : $request->email;
-
-        $data = [
-            "first_name"              => $request->first_name,
-            "last_name"               => $request->last_name,
-            "email"                   => strtolower($email),
-            "email_verified_at"       => NULL,
-            "email_verify_token"      => randomString(32),
-            "remember_token"          => "",
-            "status"                  => "active",
-            "created_at"              => time(),
-            "updated_at"              => time(),
-            "trial_ends_at"           => Carbon::now()->addDays(14)->timestamp, //time()
-            "trial_ended"             => 0,
-            "active_workspace"        => NULL,
-            "website"                 => NULL,
-            "utm_source"              => isset($_COOKIE['utm_source']) ? $_COOKIE['utm_source'] : "",
-            "utm_medium"              => isset($_COOKIE['utm_medium']) ? $_COOKIE['utm_medium'] : "",
-            "utm_campaign"            => isset($_COOKIE['utm_campaign']) ? $_COOKIE['utm_campaign'] : "",
-            "landing_page_url"        => isset($_COOKIE['landing_page_url_update']) ? $_COOKIE['landing_page_url_update'] : "",
-            "user_type"               => USER_TYPE_USER,
-            /*"permissions"             => $permissions,*/
-            "ip"                      => $request->ip(),
-            "profile_pic"             => '/backend/images/avatar.png',
-            "timezone"                => $timezone,
-            "last_login_at"           => time(),
-            #onboarding details
-            "registration_step"       => 2,
-            "company"                 => '',
-            "people_use_qty"          => '',
-            "hear_about_us"           => '',
-            "phone"                   => '',
-            "business_model"          => 'business', # business,agency,other
-            "business_area"           => [],
-            #stripe Info
-            "plan_type"               => 'free',
-            "customer_id"                  => NULL,
-            "price_id"                => '',
-            "leads_limit"             => 15,
-            "leads_limit_used"        => 0,
-            "verification_limit"      => 15,
-            "verification_limit_used" => 0,
-
-        ];
-        if ($mode === 'registration') {
-            $data['name'] = $request->first_name . ' ' . $request->last_name;
-            $data['phone'] = $request->phone;
-//            $data['countryCode'] = $request->countryCode;
-//            $data['phoneCode'] = $request->phoneCode;
-            $data['password'] = Hash::make($request->password);
-            $data['avatar'] = '';
-            $data['register_from'] = 'salesMix';
-        } else if ($mode === 'social') {
-            $data['name'] = $user_social_data->name ?? '';
-            $data['password'] = "";
-            $data['avatar'] = $user_social_data->avatar ?? '';
-            $data[$driver . '_id'] = $user_social_data->id ?? '';
-            $data['register_from'] = $driver;
-            $data['registration_step'] = 1;
-            $data['email_verified_at'] = time();
-            $data['email_verify_token'] = '';
-        }
-        if(empty($data['first_name'])){
-            $data['first_name'] = explode(' ',  $data['name'])[0] ?? "";
-        }
-        if(empty($data['last_name'])){
-            $data['last_name'] = explode(' ',  $data['name'])[1] ?? "";
-        }
-
-        return $data;
-    }
-
-
-    public function __resendVerifyEmail() {
+    public
+    function __resendVerifyEmail() {
         try {
             $str = randomString(32);
             $this->mdb->update([
@@ -346,7 +188,8 @@ class AuthService  extends BaseService {
         }
     }
 
-    public function verifyEmail($id, $token) {
+    public
+    function verifyEmail($id, $token) {
         try {
             $user = $this->mdb->get([
                 'index' => TBL_USER,
@@ -385,34 +228,8 @@ class AuthService  extends BaseService {
         }
     }
 
-//    private function addUserInitialPlans($userId): string {
-//        $data = [
-//            #plan details
-//            "user_id"                 => $userId,
-//            "plan_name"               => '',
-//            'subscription_type'       => 'free',
-//            "email_sending_limit"     => 10,
-//            "email_sending_used"      => 0,
-//            "contacts_upload_limit"   => 100,
-//            "contacts_upload_used"    => 0,
-//            "verification_limit"      => 25,
-//            "verification_limit_used" => 0,
-//            "leads_limit"             => 25,
-//            "leads_limit_used"        => 0,
-//        ];
-//        $id = randomString(32);
-//        $this->mdb->index([
-//            'index' => TBL_USER_CREDIT,
-//            'id'    => $id,
-//            'body'  => $data
-//        ]);
-//        return $id;
-//    }
-
-    /**
-     * @return void
-     */
-    public function rememberMeCheck(): void {
+    public
+    function rememberMeCheck(): void {
         if (isset($_COOKIE[REMEMBERME]) && !empty($_COOKIE[REMEMBERME])) {
             $token = $this->mdb->search([
                 'index' => TBL_USER,
@@ -437,7 +254,8 @@ class AuthService  extends BaseService {
      *
      * @return void
      */
-    public function setRememberMe($request): void {
+    public
+    function setRememberMe($request): void {
         if (isset($request->remember) && $request->remember == 'true') {
             $token = randomString(32);
             setcookie(REMEMBERME, $token, time() + (86400 * 7), "/"); // 86400 = 1 day
@@ -458,7 +276,8 @@ class AuthService  extends BaseService {
      *
      * @return JsonResponse|void
      */
-    public function reCaptchaValidate($request) {
+    public
+    function reCaptchaValidate($request) {
         $checkReCaptcha = $this->checkReCaptacha($request->all());
         if (config('app.debug') == 'true') {
             $checkReCaptcha['status'] = 'success';

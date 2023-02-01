@@ -7,7 +7,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(UserController::class)->group(function () {
-    Route::middleware(['subscription'])->group(function () {
+//    Route::middleware(['subscription'])->group(function () {
         Route::get('dashboard', 'dashboard')->name('dashboard');
         Route::post('get-workspace-member', 'getWorkspaceMembers')->name('getWorkspaceMembers')->middleware('permission:member_view');
         Route::post('create-workspaces', 'createWorkspace')->name('createWorkspace')->middleware('permission:member_create');
@@ -21,7 +21,7 @@ Route::controller(UserController::class)->group(function () {
         Route::post('profile-update', 'profileUpdate')->name('profileUpdate');
         Route::post('password-update', 'updatePassword')->name('updatePassword');
         Route::post('upload-profile-picture', 'uploadProfilePicture')->name('uploadProfilePicture');
-    });
+//    });
 
     Route::get('get-workspaces', 'getWorkspaces')->name('getWorkspaces');
     Route::post('switch-workspaces', 'switchWorkspace')->name('switchWorkspace');

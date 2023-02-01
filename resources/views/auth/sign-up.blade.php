@@ -36,20 +36,15 @@
                     <h3 class="title mb-3">Create a new account</h3>
                 </div>
                 <form class="row g-xl-3 g-2" @submit.prevent="signupProcess()">
-                    <div class="col-md-6">
-                        <label for="firstName" class="form-label">First Name <span>*</span></label>
-                        <input type="text" x-model="formData.first_name" class="form-control" id="firstName">
-                        <div class="form-text" x-text="error.first_name.length > 0 ? error.first_name : '' "></div>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="lastName" class="form-label">Last Name <span>*</span></label>
-                        <input type="text" x-model="formData.last_name" class="form-control" id="lastName">
-                        <div class="form-text" x-text="error.last_name.length > 0 ? error.last_name : '' "></div>
+                    <div class="col-md-12">
+                        <label for="name" class="form-label">Name <span>*</span></label>
+                        <input type="text" x-model="formData.name" class="form-control" id="name">
+                        <div class="form-text" x-text="error.name"></div>
                     </div>
                     <div class="col-md-12">
                         <label for="email" class="form-label">Email <span>*</span></label>
                         <input type="text" x-model="formData.email" class="form-control" id="email">
-                        <div class="form-text" x-html="error.email.length > 0 ? error.email : '' "></div>
+                        <div class="form-text" x-text="error.email"></div>
                     </div>
                     <div class="col-12">
                         <div class="position-relative d-flex justify-content-between">
@@ -101,7 +96,7 @@
                                 </svg>
                             </span>
                         </div>
-                        <div class="form-text" x-text="error.password.length > 0 ? error.password : '' "></div>
+                        <div class="form-text" x-text="error.password"></div>
                     </div>
                     <div class="col-12">
                         <div class="form-check mb-2">
@@ -111,13 +106,9 @@
                                 <a href="https://salesmix.com/privacy" target="_blank" class="btn-link">Privacy Policy</a>
                             </label>
                         </div>
-                            <div class="form-text" x-text="error.tc.length > 0 ? error.tc : '' "></div>
+                            <div class="form-text" x-text="error.tc"></div>
                     </div>
-                    <div class="col-12">
-                        <div class="google_recaptach clear">
-                            <div class="g-recaptcha" data-callback="reCaptchaCallback()" data-sitekey="{{RECAPTCHA_ID}}"></div>
-                        </div>
-                    </div>
+
 
                     <div class="col-12">
                         <button type="submit" class="btn btn-primary w-100 btn-loading">Join Now</button>
@@ -154,25 +145,18 @@
                     errorAlert: false,
                     successAlert: false,
                     formData : {
-                        first_name : '',
-                        last_name : '',
+                        name : '',
                         email : '',
                         password : '',
                         tc : ''
                     },
-                    error : {
-                        first_name : '',
-                        last_name : '',
-                        email : '',
-                        password : '',
-                        tc : ''
-                    },
+                    error : {},
                     signupProcess(){
                         let self = this;
                         let err = this.fromValidation();
                         if(!err){
                             let url = "{{route('registration')}}";
-                            this.formData['g-recaptcha-response'] = $('#g-recaptcha-response').val();
+                            // this.formData['g-recaptcha-response'] = $('#g-recaptcha-response').val();
                             makeAjaxPost(this.formData,url,'btn-loading').done(res => {
                                 if (res.success) {
                                     self.errorAlert = false;
@@ -192,8 +176,7 @@
                     },
                     fromValidation(){
                         let err = false;
-                        this.error.first_name = validation(this.formData.first_name,['required','max:14'],'First name');
-                        this.error.last_name = validation(this.formData.last_name,['required','max:14'],'Last name');
+                        this.error.name = validation(this.formData.name,['required','max:14'],'First name');
                         this.error.email = validation(this.formData.email,['required','email']);
                         this.error.password = validation(this.formData.password,['required','min:8','max:14','strong:30']);
                         this.error.tc = validation(this.formData.tc,['required|Please agree to the Terms and Conditions to continue.']);

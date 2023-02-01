@@ -31,17 +31,6 @@
             <input type="text" class="form-control" placeholder="Search">
         </div>
         <!--  trial remainng -->
-        <div class="d-flex ms-4 ps-3 align-items-center">
-            @if(auth()->user()->plan_type == 'trial')
-                <div class="description-sm bg-danger-light text-danger px-3 py-1 fw-medium rounded-2 lh-lg text-nowrap">
-                <span>
-                    {{round(abs(time() - auth()->user()->trial_end_at)/86400)}}
-                </span>
-                    days trial remaining
-                </div>
-            @endif
-            <a href="{{url('billing')}}" class="btn btn-primary btn-sm" style="margin-left: -2px">Upgrade</a>
-        </div>
         <!-- user notifications -->
         <div class="user-notification-wrap ms-4 ps-3">
             <div class="dropdown">
@@ -161,7 +150,7 @@
         <div class="user-profile-wrap ms-4 ps-3">
             <div class="dropdown">
                 <div class="dropdown-toggle user-dropdown-toggle end-0" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img class="user-profile-img" src="{{ url(auth()->user()->profile_pic) }}" alt="userlogo">
+{{--                    <img class="user-profile-img" src="{{ url(auth()->user()->profile_pic) }}" alt="userlogo">--}}
                     <p class="user-profile-name ms-2 me-xxl-3 d-none d-md-block">{{auth()->user()->name}}</p>
                 </div>
                 <ul class="dropdown-menu mt-3 pt-3 pb-2" aria-labelledby="dropdownMenuButton1">
@@ -169,7 +158,7 @@
                         <p class="description-sm pb-2" x-text="Object.keys(activeWorkspace).length > 0 ? shortStr(activeWorkspace.name,15):'Loading...'"></p>
                         <p class="description-sm text-body pb-1"><span x-text="Object.keys(activeWorkspace).length > 0 ? activeWorkspace.members : 0 "></span> member(s)</p>
                     </li>
-                    <li><a class="dropdown-item user-dropdown-item" href="{{route('settings')}}">
+                    <li><a class="dropdown-item user-dropdown-item" href="#">
                             <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M5.9999 6.34146C7.82262 6.34146 9.30023 4.92188 9.30023 3.17073C9.30023 1.41958 7.82262 0 5.9999 0C4.17718 0 2.69957 1.41958 2.69957 3.17073C2.69957 4.92188 4.17718 6.34146 5.9999 6.34146Z" fill="currentColor"/>
                                 <path d="M6 7.92683C2.69307 7.92683 0 10.0576 0 12.6829C0 12.8605 0.145215 13 0.330033 13H11.67C11.8548 13 12 12.8605 12 12.6829C12 10.0576 9.30693 7.92683 6 7.92683Z" fill="currentColor"/>

@@ -107,7 +107,6 @@ const root = {
     },
     siteInit() {
         // this.customSelectBoxInit();
-        this.countNotifications();
     },
 
     reloadCustomSelectBox(){
