@@ -1,0 +1,108 @@
+.all-inbox-email-list {
+    max-width: 290px;
+    width: 100%;
+}
+.inbox-email-page{
+    height: calc(100vh - 170px);
+    overflow: auto;
+}
+.inbox-email-item-details,
+.inbox-email-item{
+    font-size: var(--fs-body);
+    line-height: 1.2;
+    color: var(--dark);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--light);
+    cursor: pointer;
+    background: transparent;
+    transition: 0.3s ease-in-out;
+}
+.inbox-email-item-details:hover {
+    background: rgba(54, 16, 204, 0.03);
+    box-shadow: 0px 2px 5px rgb(0 0 0 / 4%);
+}
+
+.inbox-email-item:last-child{
+    border-bottom: 0;
+}
+.inbox-email-right{
+    height: 26px;
+}
+.inbox-email-item.active,
+.inbox-email-item:hover{
+   background: rgba(54, 16, 204, 0.03);
+}
+.inbox-email-actions{
+    visibility: hidden;
+    opacity: 0;
+    transition: 0.3s ease-in-out;
+    margin-top: -16px;
+}
+.inbox-email-date{
+    transition: 0.3s ease-in-out;
+}
+.inbox-email-item-details:hover .inbox-email-actions{
+    visibility: visible;
+    opacity: 1;
+}
+.inbox-email-item-details:hover .inbox-email-date{
+    visibility: hidden;
+    opacity: 0;
+}
+.inbox-email-date{
+    font-size: var(--fs-sm);
+    line-height: 1.15;
+    color: var(--body);
+}
+.unread-inbox-email-item{
+    /* border-left: 2px solid var(--dark); */
+}
+/* .unread-inbox-email-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: var(--dark);
+    width: 1px;
+    height: 100%;
+} */
+.unread-inbox-email-item .description{
+    font-weight: 500;
+    color: var(--dark) !important;
+}
+.unread-inbox-email-item .title-sm {
+    color: var(--dark) !important;
+    font-weight: 600;
+}
+.inbox-email-item-details .form-check-input[type="checkbox"]{
+    border-color: var(--border);
+}
+.unread-inbox-email-item.inbox-email-item-details .form-check-input[type="checkbox"]{
+    border-color: var(--dark);
+}
+.dropdown-menu-inbox-email-filtering{
+    max-width: 400px;
+    width: 100%;
+}
+
+.inbox-email-data-table .table-details:first-child {
+    padding-left: 16px;
+    padding-right: 0px;
+    width: 32px;
+}
+.inbox-email-description{
+    max-width: 900px;
+}
+.inbox-email-data-table .table> :not(caption)>*>* {
+    padding: 12px 16px;
+}
+.inbox-holder-img{
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.inbox-email-body {
+    max-height: calc(100vh - 120px);
+    overflow: auto;
+}

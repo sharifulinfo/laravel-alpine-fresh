@@ -1,0 +1,125 @@
+@media (max-width: 1399px) {
+
+
+    .modal-dialog {
+        max-width: 580px;
+    }
+    .modal-md {
+        max-width: 510px;
+    }
+    .modal-sm {
+        max-width: 380px;
+    }
+    .email-provider-item {
+        width: 92px;
+        height: 92px;
+        border-radius: 4px;
+        text-align: center;
+    }
+    .email-provider-item svg {
+        width: 32px;
+        height: 32px;
+    }
+    .email-provider-item .title-sm {
+        font-size: var(--fs-xs);
+    }
+    .user-profile-wrap .dropdown-toggle {
+        padding-right: 24px;
+    }
+    .dashboard-chart-height{
+        min-height: unset;
+    }
+    .loading-warmup{
+        min-height: 210px;
+    }
+}
+
+@media (max-width: 1199px) {
+    .ms-40 {
+        margin-left: 24px;
+    }
+    .theme-search-box-wrap .form-control{
+        min-width: 176px;
+    }
+    .table> :not(caption)>*>* {
+        padding: 6px 8px;
+    }
+    .table-header,
+    .table-details{
+        font-size: var(--fs-sm);
+    }
+    .btn-step {
+        padding: 4px 8px;
+        margin: 0;
+    }
+    .marketplace-item {
+        padding: 16px;
+    }
+    .prospect-lists-folder{
+        max-width: 210px;
+    }
+    .prospect-lists-table{
+        width: calc(100% - 226px);
+    }
+    .theme-sidenav-wrap{
+        width: 60px;
+    }
+    .main {
+        margin-left: 60px;
+    }
+    .added-step::after {
+        left: 28px;
+    }
+    .text-hover-hide {
+        max-width: 135px;
+    }
+    .prospect-lists .list-group-item:hover .text-hover-hide {
+        max-width: 66px;
+    }
+}
+
+
+@media (max-width: 991px) {
+    body {
+        font-size: var(--fs-sm);
+    }
+
+    .btn {
+        font-size: var(--fs-sm);
+    }
+
+    .user-dropdown-toggle::after {
+        display: none;
+    }
+
+    .modal-body {
+        padding: 0 24px 24px 24px;
+    }
+    .nav-security .w-50{
+        width: 100% !important;
+    }
+    .settings-wrap {
+        width: calc(100%);
+    }
+    .profile-wrap {
+        min-height: 100%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 767px) {
+    .title-lg{
+        font-size: var(--fs-md);
+    }
+    .odometer-value {
+        font-size: 20px;
+    }
+}
+@media (max-width: 575px) {
+
+}
+@media (max-width: 480px) {
+    .modal-body {
+        padding: 0 20px 16px 20px;
+    }
+}
