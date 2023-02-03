@@ -85,10 +85,10 @@
 
             @if(session()->has('LoggedInUserId'))
                 function backToAdmin(){
-                    makeAjaxPost(this.meta, '{{route("spyUserLogout")}}', 'loggedInOut').done(res => {
+                    makeAjaxPost(this.meta, '#', 'loggedInOut').done(res => {
                         if(res.success){
                             setTimeout(()=>{
-                                window.location.href = "{{route('users')}}";
+                                window.location.href = "#";
                             },500);
                         }else{
                             swalError(res.msg);

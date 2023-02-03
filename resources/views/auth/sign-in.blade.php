@@ -125,7 +125,7 @@
                         makeAjaxPost(this.formData, url, 'btn-loading').done(res => {
                             if (res.success) {
                                 if (res.data.user_type === 'admin') {
-                                    {{--window.location.href = '{{route('adminDashboard')}}';--}}
+                                    window.location.href = '{{route('adminDashboard')}}';
                                 } else {
                                     window.location.href = '{{route('dashboard')}}';
                                 }

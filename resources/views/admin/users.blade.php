@@ -160,13 +160,13 @@
             </table>
         </div>
         <div style="display: none" x-show="!userLoading && users.length > 0">
-            @include('layouts.includes.pagination',['loadData' => 'getUsers'])
+
         </div>
-        <!-- Update User Modal -->
+{{--        <!-- Update User Modal -->--}}
         @include('admin.modals.user_update_modal')
-        <!-- Upgrade User Modal -->
-        @include('admin.modals.user_upgrade_modal')
-        @include('admin.offcanvas.user_details')
+{{--        <!-- Upgrade User Modal -->--}}
+{{--        @include('admin.modals.user_upgrade_modal')--}}
+{{--        @include('admin.offcanvas.user_details')--}}
 
     </div>
 
@@ -178,7 +178,7 @@
             selectedUserIndex: 0,
             selectedUser: [],
             init() {
-                paginationLoader.metaInitiation(this);
+                // paginationLoader.metaInitiation(this);
                 this.getUsers()
             },
             meta: {
@@ -211,112 +211,16 @@
                 makeAjaxPost(this.meta, '{{route("getUsers")}}', false).done(res => {
                     if (res.success) {
                         self.users = res.data;
-                        paginationLoader.updateMetaAfterLoad(res.meta, self)
+                        // paginationLoader.updateMetaAfterLoad(res.meta, self)
                         for (i in self.users) {
                             self.usersIds[i] = self.users[i].active_workspace
                         }
-                        self.getUserMetaAnalytics();
                     } else {
                         self.users = [];
                     }
                     self.userLoading = false;
                 })
             },
-            getUserMetaAnalytics() {
-                let self = this;
-                makeAjaxPost({ids: this.usersIds}, '{{route("getUserMetaAnalytics")}}', false).done(res => {
-                    if (res.success) {
-                        self.userAnalytics = res.data
-                    } else {
-                        self.userAnalytics = {};
-                    }
-                })
-            },
-            spyUser(id) {
-                // swalConfirm("To login this account").then(s =>{
-                //     if(s.value){
-                // let self = this;
-                this.btnLoading = true;
-                let url = "{{route('spyUserLogin')}}";
-                makeAjaxPost({id: id}, url, 'spying' + id).done(res => {
-                    console.log(res);
-                    if (res.success) {
-                        window.location.href = "{{url('dashboard')}}";
-                    } else {
-                        swalError(res.msg);
-                    }
-                }).error(err => {
-                    swalError('not success');
-                })
-                //     }
-                // });
-            },
-            upgradeUser(getN, i) {
-                this.selectedUser = getN;
-                this.selectedUserIndex = i;
-                this.upgradeUserData.id = getN.id;
-                this.upgradeUserData.plan_type = getN.plan_type;
-                this.upgradeUserData.selected_plan = getN.plan_name === '' ? 'starter' : getN.plan_name;
-                $('#UpgradeUserModal').modal('show');
-            },
-            upgradeUserData: {
-                'id': '',
-                'plan_type': 'free',
-                'selected_plan': 'starter',
-                'verification': 0,
-                'leads': 0,
-            },
-
-            upgradeUserAction() {
-                let self = this;
-                let url = "{{route('upgradeUser')}}";
-                makeAjaxPost(this.upgradeUserData, url, 'upgrading').done(res => {
-                    if (res.success) {
-                        self.users[self.selectedUserIndex].plan_type = self.upgradeUserData.plan_type;
-                        if (self.upgradeUserData.plan_type !== 'free') {
-                            self.users[self.selectedUserIndex].plan_name = self.upgradeUserData.selected_plan;
-                            self.users[self.selectedUserIndex].leads_balance = self.total_leads_balance;
-                            self.users[self.selectedUserIndex].verification_balance = self.total_verification_balance;
-                        }
-                        $('#UpgradeUserModal').modal('hide');
-                    } else {
-                        swalError(res.msg);
-                    }
-                }).error(err => {
-                    swalError('not success');
-                })
-            },
-            total_verification_balance: 0,
-            total_leads_balance: 0,
-            addVerification() {
-                this.total_verification_balance = this.formatAmount(parseInt(this.selectedUser.verification_balance) + parseInt(this.upgradeUserData.verification), false);
-            },
-            addLeads() {
-                this.total_leads_balance = this.formatAmount(parseInt(this.selectedUser.leads_balance) + parseInt(this.upgradeUserData.leads), false);
-            },
-
-            blockedUser(getN, index) {
-                let self = this;
-                let type = 'active';
-                if (getN.status === 'active') {
-                    type = 'blocked';
-                }
-                swalConfirm("Are you sure to do this action.", 'Blocking Warning!').then(s => {
-                    if (s.value) {
-                        let url = "{{route('blockUser')}}";
-                        makeAjaxPost({id: getN.id, type: type}, url, 'blocking' + getN.id).done(res => {
-                            if (res.success) {
-                                self.users[index].status = type;
-                            } else {
-                                swalError(res.msg);
-                            }
-                        }).error(err => {
-                            swalError('not success');
-                        })
-                    }
-                })
-            },
-
             updateUserData: {},
             editUser(getN, i) {
                 this.selectedUser = getN;
@@ -332,7 +236,7 @@
             },
             updateUser(){
                 let self = this;
-                let url = "{{route('updateUser')}}";
+                let url = "#";
                 makeAjaxPost(this.updateUserData, url, 'updating_user').done(res => {
                     if (res.success) {
                         self.users[self.selectedUserIndex].name = res.data.name;
@@ -350,7 +254,7 @@
                 swalConfirm("Are you sure to remove this user. It will also remove all email/sequence/analytics/members/workspaces etc..", 'Remove Warning!').then(s => {
                     if (s.value) {
                         this.users[i]['deleting'] = true;
-                        makeAjaxPost({id: id}, "{{route('deleteUser')}}").done(res => {
+                        makeAjaxPost({id: id}, "#").done(res => {
                             if (res.success) {
                                 $('#row_' + i).remove();
                             } else {
@@ -367,7 +271,7 @@
                 $("#userDetails").offcanvas('show');
             },
             downloadAllUsers() {
-                let url = "{{route('downloadUsers')}}";
+                let url = "#";
                 makeAjaxPost({}, url,'downloading').done(res => {
                     if (res.success) {
                         window.location.href = "{{asset('downloads')}}/" + res.data.file;
